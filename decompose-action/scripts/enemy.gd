@@ -4,6 +4,7 @@ extends Node2D
 @export var aim_duration: float = 1.4
 @export var reload_duration: float = 1.0
 @export var aim_line_width: float = 4.0
+@export var shot_max_distance: float = 1000.0
 
 @onready var body: ColorRect = get_node_or_null("Body")
 @onready var gun_target: Node2D = get_node_or_null("GunTarget")
@@ -17,6 +18,8 @@ var player: Node2D = null
 var aim_line: Line2D = null
 var state: String = "wait"
 var timer: float = 0.0
+var locked_shot_start: Vector2 = Vector2.ZERO
+var locked_shot_end: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	_set_body_color(Color(1.0, 1.0, 1.0, 1.0))
@@ -48,12 +51,11 @@ func _process(delta: float) -> void:
 		"wait":
 			_hide_aim_line()
 			if timer <= 0.0:
-				state = "aim"
-				timer = aim_duration
+				_start_aim()
 		"aim":
 			_update_aim_line()
 			if timer <= 0.0:
-				print("Enemy shot")
+				_fire_locked_shot()
 				state = "reload"
 				timer = reload_duration
 		"reload":
@@ -84,14 +86,53 @@ func on_target_broken(target: Node) -> void:
 		_:
 			print("Unknown target broken: ", target.name)
 
-func _update_aim_line() -> void:
-	if aim_line == null or gun_target == null or player == null:
+func _start_aim() -> void:
+	state = "aim"
+	timer = aim_duration
+	_lock_shot_line()
+	_update_aim_line()
+
+func _lock_shot_line() -> void:
+	if gun_target == null or player == null:
 		return
-	var start: Vector2 = to_local(gun_target.global_position)
-	var end: Vector2 = to_local(player.global_position + Vector2(0, -32))
+
+	locked_shot_start = gun_target.global_position
+	var aim_to_player: Vector2 = player.global_position + Vector2(0, -32) - locked_shot_start
+	if aim_to_player.length() <= 0.01:
+		aim_to_player = Vector2.LEFT
+	locked_shot_end = locked_shot_start + aim_to_player.normalized() * shot_max_distance
+
+func _update_aim_line() -> void:
+	if aim_line == null:
+		return
+	var start: Vector2 = to_local(locked_shot_start)
+	var end: Vector2 = to_local(locked_shot_end)
 	aim_line.points = PackedVector2Array([start, end])
 	aim_line.width = aim_line_width
 	aim_line.visible = true
+
+func _fire_locked_shot() -> void:
+	_hide_aim_line()
+	if player == null or not player.visible:
+		return
+
+	var player_point: Vector2 = player.global_position + Vector2(0, -32)
+	var distance: float = _distance_point_to_segment(player_point, locked_shot_start, locked_shot_end)
+	if distance <= 24.0:
+		if player.has_method("on_shot"):
+			player.on_shot()
+		print("Enemy shot: hit")
+	else:
+		print("Enemy shot: missed")
+
+func _distance_point_to_segment(point: Vector2, a: Vector2, b: Vector2) -> float:
+	var ab: Vector2 = b - a
+	var ab_len_squared: float = ab.length_squared()
+	if ab_len_squared <= 0.001:
+		return point.distance_to(a)
+	var t: float = clamp((point - a).dot(ab) / ab_len_squared, 0.0, 1.0)
+	var closest: Vector2 = a + ab * t
+	return point.distance_to(closest)
 
 func _hide_aim_line() -> void:
 	if aim_line != null:
