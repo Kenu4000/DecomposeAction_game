@@ -3,11 +3,30 @@ extends CharacterBody2D
 @export var move_speed: float = 220.0
 @export var jump_velocity: float = -520.0
 @export var gravity: float = 1400.0
+@export var max_health: int = 3
+@export var hit_flash_time: float = 0.2
 
 @onready var decompose_ui: Node = get_parent().get_node_or_null("DecomposeUI")
+@onready var body: ColorRect = get_node_or_null("Body")
 
 var frozen_velocity: Vector2 = Vector2.ZERO
 var was_ability_active: bool = false
+var health: int = 3
+var hit_timer: float = 0.0
+var normal_color: Color = Color(1.0, 1.0, 1.0, 1.0)
+
+func _ready() -> void:
+	health = max_health
+	if body != null:
+		normal_color = body.color
+
+func _process(delta: float) -> void:
+	if hit_timer <= 0.0:
+		return
+
+	hit_timer -= delta
+	if hit_timer <= 0.0 and body != null:
+		body.color = normal_color
 
 func _physics_process(delta: float) -> void:
 	var ability_active: bool = false
@@ -33,3 +52,15 @@ func _physics_process(delta: float) -> void:
 	var direction: float = Input.get_axis("move_left", "move_right")
 	velocity.x = direction * move_speed
 	move_and_slide()
+
+func on_shot() -> void:
+	health -= 1
+	hit_timer = hit_flash_time
+	if body != null:
+		body.color = Color(1.0, 0.15, 0.15, 1.0)
+
+	print("Player hit. HP: ", health)
+	if health <= 0:
+		print("Player defeated")
+		visible = false
+		set_physics_process(false)
