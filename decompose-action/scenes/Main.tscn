@@ -1,3 +1,69 @@
 [gd_scene format=3 uid="uid://1dnso7oo1pbg"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qnwvq"]
+size = Vector2(32, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_elqb8"]
+size = Vector2(1000, 40)
+
 [node name="Main" type="Node2D" unique_id=208912674]
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1207561795]
+position = Vector2(0, 280)
+
+[node name="Body" type="ColorRect" parent="Player" unique_id=591185387]
+offset_left = -16.0
+offset_top = -64.0
+offset_right = 16.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1411060077]
+position = Vector2(0, -32)
+shape = SubResource("RectangleShape2D_qnwvq")
+
+[node name="Enemy" type="Node2D" parent="." unique_id=2109699255]
+position = Vector2(300, 236)
+
+[node name="Body" type="ColorRect" parent="Enemy" unique_id=1345504331]
+offset_left = -16.0
+offset_top = -64.0
+offset_right = 16.0
+
+[node name="GunTarget" type="Node2D" parent="Enemy" unique_id=799531085]
+position = Vector2(-40, -40)
+
+[node name="ArmTarget" type="Node2D" parent="Enemy" unique_id=757107485]
+position = Vector2(-20, -20)
+
+[node name="NeckTarget" type="Node2D" parent="Enemy" unique_id=1767502725]
+position = Vector2(0, -70)
+
+[node name="decomposeUI" type="CanvasLayer" parent="." unique_id=956853533]
+
+[node name="BlueOverlay" type="ColorRect" parent="decomposeUI" unique_id=1458212449]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1764706, 0.36078432, 1, 0.2)
+
+[node name="Lines" type="Node2D" parent="decomposeUI" unique_id=1409408438]
+
+[node name="SelectedMarker" type="ColorRect" parent="decomposeUI" unique_id=511565489]
+visible = false
+offset_right = 32.0
+offset_bottom = 40.0
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1382988745]
+
+[node name="Ground" type="StaticBody2D" parent="." unique_id=459347598]
+position = Vector2(0, 300)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground" unique_id=1663889818]
+shape = SubResource("RectangleShape2D_elqb8")
+
+[node name="ColorRect" type="ColorRect" parent="Ground" unique_id=897545060]
+offset_left = -500.0
+offset_top = -20.0
+offset_right = 500.0
+offset_bottom = 20.0
