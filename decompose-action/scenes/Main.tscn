@@ -1,4 +1,9 @@
-[gd_scene format=3 uid="uid://1dnso7oo1pbg"]
+[gd_scene load_steps=7 format=3 uid="uid://1dnso7oo1pbg"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="2_enemy"]
+[ext_resource type="Script" path="res://scripts/decompose_target.gd" id="3_target"]
+[ext_resource type="Script" path="res://scripts/target_ui.gd" id="4_target_ui"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qnwvq"]
 size = Vector2(32, 64)
@@ -10,6 +15,7 @@ size = Vector2(1000, 40)
 
 [node name="Player" type="CharacterBody2D" parent="." unique_id=1207561795]
 position = Vector2(0, 280)
+script = ExtResource("1_player")
 
 [node name="Body" type="ColorRect" parent="Player" unique_id=591185387]
 offset_left = -16.0
@@ -22,6 +28,7 @@ shape = SubResource("RectangleShape2D_qnwvq")
 
 [node name="Enemy" type="Node2D" parent="." unique_id=2109699255]
 position = Vector2(300, 236)
+script = ExtResource("2_enemy")
 
 [node name="Body" type="ColorRect" parent="Enemy" unique_id=1345504331]
 offset_left = -16.0
@@ -30,14 +37,27 @@ offset_right = 16.0
 
 [node name="GunTarget" type="Node2D" parent="Enemy" unique_id=799531085]
 position = Vector2(-40, -40)
+script = ExtResource("3_target")
+target_type = "gun"
+display_name = "Gun"
+mental_effect = 1
 
 [node name="ArmTarget" type="Node2D" parent="Enemy" unique_id=757107485]
 position = Vector2(-20, -20)
+script = ExtResource("3_target")
+target_type = "arm"
+display_name = "Arm"
+mental_effect = 2
 
 [node name="NeckTarget" type="Node2D" parent="Enemy" unique_id=1767502725]
 position = Vector2(0, -70)
+script = ExtResource("3_target")
+target_type = "neck"
+display_name = "Neck"
+mental_effect = 5
 
 [node name="DecomposeUI" type="CanvasLayer" parent="." unique_id=956853533]
+script = ExtResource("4_target_ui")
 
 [node name="BlueOverlay" type="ColorRect" parent="DecomposeUI" unique_id=1458212449]
 anchors_preset = 15
