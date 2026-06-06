@@ -74,27 +74,29 @@ func execute_selected() -> void:
 
 func refresh_targets() -> void:
 	targets.clear()
-	var root := get_parent()
+	var root: Node = get_parent()
 	if root == null:
 		return
-	for node in root.find_children("*", "DecomposeTarget", true, false):
-		if node is DecomposeTarget and not node.broken:
-			targets.append(node)
+	for node: Node in root.find_children("*", "DecomposeTarget", true, false):
+		if node is DecomposeTarget:
+			var target: DecomposeTarget = node as DecomposeTarget
+			if not target.broken:
+				targets.append(target)
 
 func update_selection() -> void:
 	selected_target = null
 	if player == null:
 		return
-	var aim := Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
+	var aim: Vector2 = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
 	if aim.length() < aim_deadzone:
 		return
-	var aim_angle := aim.angle()
-	var best_diff := deg_to_rad(max_aim_angle_degrees)
-	for target in targets:
-		var to_target := target.global_position - player.global_position
+	var aim_angle: float = aim.angle()
+	var best_diff: float = deg_to_rad(max_aim_angle_degrees)
+	for target: DecomposeTarget in targets:
+		var to_target: Vector2 = target.global_position - player.global_position
 		if to_target.length() <= 0.01:
 			continue
-		var diff := abs(angle_difference(aim_angle, to_target.angle()))
+		var diff: float = abs(angle_difference(aim_angle, to_target.angle()))
 		if diff <= best_diff:
 			best_diff = diff
 			selected_target = target
@@ -102,27 +104,31 @@ func update_selection() -> void:
 func update_visuals() -> void:
 	if player == null:
 		return
-	var player_screen := world_to_screen(player.global_position)
-	var alive := {}
-	for target in targets:
+	var player_screen: Vector2 = world_to_screen(player.global_position)
+	var alive: Dictionary = {}
+	for target: DecomposeTarget in targets:
 		alive[target] = true
-		var target_screen := world_to_screen(target.global_position)
-		var marker := get_marker(target)
+		var target_screen: Vector2 = world_to_screen(target.global_position)
+		var marker: ColorRect = get_marker(target)
 		marker.position = target_screen - Vector2(9, 9)
 		marker.visible = true
-		var line := get_aim_line(target)
+		var line: Line2D = get_aim_line(target)
 		line.points = PackedVector2Array([player_screen, target_screen])
 		line.visible = true
-	for target in markers.keys():
+	for target: Variant in markers.keys():
 		if not alive.has(target):
-			markers[target].queue_free()
+			var old_marker: ColorRect = markers[target] as ColorRect
+			if old_marker != null:
+				old_marker.queue_free()
 			markers.erase(target)
-	for target in aim_lines.keys():
+	for target: Variant in aim_lines.keys():
 		if not alive.has(target):
-			aim_lines[target].queue_free()
+			var old_line: Line2D = aim_lines[target] as Line2D
+			if old_line != null:
+				old_line.queue_free()
 			aim_lines.erase(target)
 	if selected_target != null:
-		var p := world_to_screen(selected_target.global_position)
+		var p: Vector2 = world_to_screen(selected_target.global_position)
 		selected_marker.size = Vector2(34, 34)
 		selected_marker.position = p - Vector2(17, 17)
 		selected_marker.visible = true
@@ -131,8 +137,8 @@ func update_visuals() -> void:
 
 func get_marker(target: DecomposeTarget) -> ColorRect:
 	if markers.has(target):
-		return markers[target]
-	var marker := ColorRect.new()
+		return markers[target] as ColorRect
+	var marker: ColorRect = ColorRect.new()
 	marker.size = Vector2(18, 18)
 	marker.color = Color(0.2, 0.95, 1.0, 0.85)
 	add_child(marker)
@@ -143,8 +149,8 @@ func get_marker(target: DecomposeTarget) -> ColorRect:
 
 func get_aim_line(target: DecomposeTarget) -> Line2D:
 	if aim_lines.has(target):
-		return aim_lines[target]
-	var line := Line2D.new()
+		return aim_lines[target] as Line2D
+	var line: Line2D = Line2D.new()
 	line.width = 3.0
 	line.default_color = Color(0.25, 0.85, 1.0, 0.65)
 	lines_root.add_child(line)
@@ -152,12 +158,14 @@ func get_aim_line(target: DecomposeTarget) -> Line2D:
 	return line
 
 func clear_visuals() -> void:
-	for marker in markers.values():
-		if is_instance_valid(marker):
+	for marker_value: Variant in markers.values():
+		var marker: ColorRect = marker_value as ColorRect
+		if marker != null and is_instance_valid(marker):
 			marker.queue_free()
 	markers.clear()
-	for line in aim_lines.values():
-		if is_instance_valid(line):
+	for line_value: Variant in aim_lines.values():
+		var line: Line2D = line_value as Line2D
+		if line != null and is_instance_valid(line):
 			line.queue_free()
 	aim_lines.clear()
 
