@@ -1,5 +1,6 @@
 extends CanvasLayer
 
+@export_range(0.01, 1.0, 0.01) var ability_time_scale: float = 0.05
 @export var max_aim_angle_degrees: float = 30.0
 @export var aim_deadzone: float = 0.25
 
@@ -13,6 +14,7 @@ var targets: Array[DecomposeTarget] = []
 var player: Node2D = null
 var markers: Dictionary = {}
 var aim_lines: Dictionary = {}
+var original_time_scale: float = 1.0
 
 func _ready() -> void:
 	blue_overlay.visible = false
@@ -46,6 +48,8 @@ func activate() -> void:
 	if active:
 		return
 	player = get_parent().get_node_or_null("Player")
+	original_time_scale = Engine.time_scale
+	Engine.time_scale = ability_time_scale
 	active = true
 	blue_overlay.visible = true
 	refresh_targets()
@@ -56,6 +60,7 @@ func deactivate() -> void:
 	if not active:
 		return
 	active = false
+	Engine.time_scale = original_time_scale
 	selected_target = null
 	blue_overlay.visible = false
 	selected_marker.visible = false
