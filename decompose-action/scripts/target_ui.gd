@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 @export_range(0.01, 1.0, 0.01) var ability_time_scale: float = 0.05
+@export_range(0.1, 5.0, 0.1) var ability_duration: float = 1.5
 @export var max_aim_angle_degrees: float = 30.0
 @export var aim_deadzone: float = 0.25
 
@@ -15,6 +16,7 @@ var player: Node2D = null
 var markers: Dictionary = {}
 var aim_lines: Dictionary = {}
 var original_time_scale: float = 1.0
+var ability_end_msec: int = 0
 
 func _ready() -> void:
 	blue_overlay.visible = false
@@ -37,6 +39,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	if not active:
 		return
+	if Time.get_ticks_msec() >= ability_end_msec:
+		deactivate()
+		return
 	refresh_targets()
 	update_selection()
 	update_visuals()
@@ -50,6 +55,7 @@ func activate() -> void:
 	player = get_parent().get_node_or_null("Player")
 	original_time_scale = Engine.time_scale
 	Engine.time_scale = ability_time_scale
+	ability_end_msec = Time.get_ticks_msec() + int(ability_duration * 1000.0)
 	active = true
 	blue_overlay.visible = true
 	refresh_targets()
