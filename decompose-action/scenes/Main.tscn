@@ -37,9 +37,9 @@ position = Vector2(-20, -20)
 [node name="NeckTarget" type="Node2D" parent="Enemy" unique_id=1767502725]
 position = Vector2(0, -70)
 
-[node name="decomposeUI" type="CanvasLayer" parent="." unique_id=956853533]
+[node name="DecomposeUI" type="CanvasLayer" parent="." unique_id=956853533]
 
-[node name="BlueOverlay" type="ColorRect" parent="decomposeUI" unique_id=1458212449]
+[node name="BlueOverlay" type="ColorRect" parent="DecomposeUI" unique_id=1458212449]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -47,9 +47,9 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1764706, 0.36078432, 1, 0.2)
 
-[node name="Lines" type="Node2D" parent="decomposeUI" unique_id=1409408438]
+[node name="Lines" type="Node2D" parent="DecomposeUI" unique_id=1409408438]
 
-[node name="SelectedMarker" type="ColorRect" parent="decomposeUI" unique_id=511565489]
+[node name="SelectedMarker" type="ColorRect" parent="DecomposeUI" unique_id=511565489]
 visible = false
 offset_right = 32.0
 offset_bottom = 40.0
